@@ -1,0 +1,31 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.canvasContainer {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0rem;
+    width: 160px;
+}
+
+.defaultContiner {
+    display: flex;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.timeContainer {
+    font-family: "Montserrat";
+    font-weight: normal;
+    font-size: 1rem;
+    text-align: center;
+    color: #02122F;
+}
