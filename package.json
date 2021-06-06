@@ -1,0 +1,28 @@
+{
+  "name": "react-audio-recorder",
+  "version": "1.0.0",
+  "description": "React audio recorder",
+  "main": "index.js",
+  "repository": "https://github.com/RishikeshVedpathak/react-audio-recorder.git",
+  "author": "Rishikesh Vedpathak <rishikeshvedpathak@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.14.3",
+    "@storybook/addon-actions": "^6.2.9",
+    "@storybook/addon-essentials": "^6.2.9",
+    "@storybook/addon-links": "^6.2.9",
+    "@storybook/react": "^6.2.9",
+    "babel-loader": "^8.2.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "peerDependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "dependencies": {},
+  "scripts": {
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  }
+}
