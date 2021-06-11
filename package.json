@@ -35,7 +35,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "react-audio-recorder",
+  "name": "@react-ac/react-audio-recorder",
   "repository": "https://github.com/RishikeshVedpathak/react-audio-recorder.git",
   "author": "Rishikesh Vedpathak <rishikeshvedpathak@gmail.com>",
   "module": "dist/react-audio-recorder.esm.js",
