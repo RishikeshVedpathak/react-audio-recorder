@@ -13,15 +13,18 @@ export interface Props extends HTMLAttributes<HTMLDivElement> {
   onGenerateAudioURL: (audioUrl: any) => void;
 }
 
-const UP_BAR_COLOR = '#432E88';
-const DOWN_BAR_COLOR = '#F4266E';
-const DEVISION_FACTOR = 7;
+const UP_BAR_COLOR = '#4285f4';
+const DOWN_BAR_COLOR = '#ADBBF2';
+const DIVISION_FACTOR = 4;
+
+let animationFrameUp: number | undefined;
+let animationFrameDown: number | undefined;
 
 const AudioRecorder: FC<Props> = ({ onGenerateAudioURL }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [recorder, setRecorder] = useState<any | null>(null);
   const [audio, setAudio] = useState<any | null>(null);
-  const [timer, setTimer] = useState<number | null>(0);
+  const [timer, setTimer] = useState<number>(0);
 
   let timerInterval: ReturnType<typeof setTimeout>;
   let audioCtx: AudioContext;
@@ -30,24 +33,31 @@ const AudioRecorder: FC<Props> = ({ onGenerateAudioURL }) => {
   let canvasDown: HTMLCanvasElement | null;
   let canvasDownCtx: false | CanvasRenderingContext2D | null;
 
-  let animationFrameUp: number;
-  let animationFrameDown: number;
-
-  /**
-   * Generate top section animated stream bars
-   */
   useEffect(() => {
-    canvasUp = document.querySelector('.visualizer1');
-    canvasUpCtx = !!canvasUp && canvasUp.getContext('2d');
-  }, []);
+    (async () => {
+      if (isRecording) {
+        const recorderInstance = await recordAudio();
+        setRecorder(recorderInstance);
+        !!recorderInstance && recorderInstance.start();
 
-  /**
-   * Generate bottom section animated stream bars
-   */
-  useEffect(() => {
-    canvasDown = document.querySelector('.visualizer2');
-    canvasDownCtx = !!canvasDown && canvasDown.getContext('2d');
-  }, []);
+        // Generate top section animated stream bars
+        canvasUp = document.querySelector('.visualizer1');
+        canvasUpCtx = !!canvasUp && canvasUp.getContext('2d');
+
+        // Generate bottom section animated stream bars
+        canvasDown = document.querySelector('.visualizer2');
+        canvasDownCtx = !!canvasDown && canvasDown.getContext('2d');
+      } else {
+        if (recorder) {
+          const recorderInstance = await recorder.stop();
+          setAudio(recorderInstance);
+          setRecorder(null);
+          !!animationFrameUp && cancelAnimationFrame(animationFrameUp);
+          !!animationFrameDown && cancelAnimationFrame(animationFrameDown);
+        }
+      }
+    })();
+  }, [isRecording]);
 
   /**
    * Timer for audio recorder
@@ -55,9 +65,10 @@ const AudioRecorder: FC<Props> = ({ onGenerateAudioURL }) => {
   useEffect(() => {
     if (isRecording) {
       timerInterval = setInterval(() => {
-        !!timer && setTimer(timer + 1);
+        setTimer(timer + 1);
       }, 1000);
     } else {
+      setTimer(0);
       clearInterval(timerInterval);
     }
 
@@ -87,10 +98,13 @@ const AudioRecorder: FC<Props> = ({ onGenerateAudioURL }) => {
     drawUp();
 
     function drawUp() {
+      if (!isRecording) return false;
+
+      animationFrameUp = undefined;
       const WIDTH = !!canvasUp ? canvasUp.width : 10;
       const HEIGHT = !!canvasUp ? canvasUp.height : 10;
       let x = 0;
-      const width = 4;
+      const width = 2;
       const height = 4;
 
       animationFrameUp = requestAnimationFrame(drawUp);
@@ -102,7 +116,7 @@ const AudioRecorder: FC<Props> = ({ onGenerateAudioURL }) => {
       }
 
       for (let i = 0; i < bufferLength; i++) {
-        var h = dataArray[i] / DEVISION_FACTOR;
+        var h = dataArray[i] / DIVISION_FACTOR;
         if (!!canvasUpCtx) {
           canvasUpCtx.rect(x, HEIGHT, width, -height);
           canvasUpCtx.fillStyle = UP_BAR_COLOR;
@@ -114,17 +128,20 @@ const AudioRecorder: FC<Props> = ({ onGenerateAudioURL }) => {
           canvasUpCtx.fillStyle = UP_BAR_COLOR;
           canvasUpCtx.fill();
         }
-        x += 8;
+        x += 4;
       }
     }
 
     drawDown();
 
     function drawDown() {
+      if (!isRecording) return false;
+
+      animationFrameDown = undefined;
       const WIDTH = !!canvasDown ? canvasDown.width : 10;
       const HEIGHT = !!canvasDown ? canvasDown.height : 10;
       let x = 0;
-      const width = 4;
+      const width = 2;
       const height = 4;
 
       animationFrameDown = requestAnimationFrame(drawDown);
@@ -136,7 +153,7 @@ const AudioRecorder: FC<Props> = ({ onGenerateAudioURL }) => {
       }
 
       for (let i = 0; i < bufferLength; i++) {
-        var h = dataArray[i] / DEVISION_FACTOR;
+        var h = dataArray[i] / DIVISION_FACTOR;
         if (!!canvasDownCtx) {
           canvasDownCtx.rect(x, 0, width, height);
           canvasDownCtx.fillStyle = DOWN_BAR_COLOR;
@@ -148,7 +165,7 @@ const AudioRecorder: FC<Props> = ({ onGenerateAudioURL }) => {
           canvasDownCtx.fillStyle = DOWN_BAR_COLOR;
           canvasDownCtx.fill();
         }
-        x += 8;
+        x += 4;
       }
     }
   }
@@ -200,21 +217,11 @@ const AudioRecorder: FC<Props> = ({ onGenerateAudioURL }) => {
   };
 
   const start = async () => {
-    const recorderInstance = await recordAudio();
-    setRecorder(recorderInstance);
-    !!recorderInstance && recorderInstance.start();
     setIsRecording(true);
   };
 
   const stop = async () => {
-    if (recorder) {
-      const recorderInstance = await recorder.stop();
-      setAudio(recorderInstance);
-      setRecorder(null);
-      setIsRecording(false);
-      cancelAnimationFrame(animationFrameUp);
-      cancelAnimationFrame(animationFrameDown);
-    }
+    setIsRecording(false);
   };
 
   const handleDiscard = () => {
@@ -229,15 +236,15 @@ const AudioRecorder: FC<Props> = ({ onGenerateAudioURL }) => {
       <div className="canvasContainer">
         <canvas
           className="visualizer1"
-          height={isRecording ? 20 : 0}
+          height={isRecording ? 40 : 0}
           width="auto"
         ></canvas>
         <canvas
           className="visualizer2"
-          height={isRecording ? 20 : 0}
+          height={isRecording ? 40 : 0}
           width="auto"
         ></canvas>
-        <div className={`defaultContiner ${isRecording ? 'hidden' : ''}`}>
+        <div className={`defaultContainer ${isRecording ? 'hidden' : ''}`}>
           <MicIcon />
         </div>
         <div className="timeContainer">
