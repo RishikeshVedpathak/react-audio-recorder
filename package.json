@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "1.0.0",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -35,12 +35,11 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "react-audio-recorder",
+  "name": "@react-ac/react-audio-recorder",
   "repository": "https://github.com/RishikeshVedpathak/react-audio-recorder.git",
   "author": "Rishikesh Vedpathak <rishikeshvedpathak@gmail.com>",
   "module": "dist/react-audio-recorder.esm.js",
-  "size-limit": [
-    {
+  "size-limit": [{
       "path": "dist/react-audio-recorder.cjs.production.min.js",
       "limit": "10 KB"
     },
